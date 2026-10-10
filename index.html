@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SYAM OSINT</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at 10% 10%, rgba(255,255,255,0.8) 0%, transparent 2%),
+                radial-gradient(circle at 30% 20%, rgba(255,255,255,0.6) 0%, transparent 1.5%),
+                radial-gradient(circle at 50% 8%, rgba(255,255,255,0.9) 0%, transparent 2.5%),
+                radial-gradient(circle at 70% 18%, rgba(255,255,255,0.7) 0%, transparent 1.8%),
+                radial-gradient(circle at 90% 12%, rgba(255,255,255,0.5) 0%, transparent 1.2%),
+                linear-gradient(135deg, #0f172a 0%, #1e293b 45%, #0f172a 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 420px;
+            background: rgba(30, 41, 59, 0.85);
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            border-radius: 24px;
+            padding: 30px 24px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.35);
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .logo h1 {
+            font-size: 32px;
+            font-weight: 900;
+            color: #38bdf8;
+            letter-spacing: 1px;
+        }
+
+        .logo p {
+            color: #94a3b8;
+            font-size: 13px;
+            margin-top: 6px;
+        }
+
+        .card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 18px;
+        }
+
+        .card h3 {
+            font-size: 15px;
+            color: #fbbf24;
+            margin-bottom: 12px;
+        }
+
+        .card p {
+            font-size: 13px;
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #94a3b8;
+            font-size: 13px;
+        }
+
+        input {
+            width: 100%;
+            padding: 13px 16px;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            border-radius: 12px;
+            color: white;
+            font-size: 15px;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #38bdf8;
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+            color: white;
+        }
+
+        .btn-login {
+            background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+            margin-bottom: 12px;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(56, 189, 248, 0.35);
+        }
+
+        .btn-wa {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            margin-bottom: 12px;
+        }
+
+        .btn-wa:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(34, 197, 94, 0.35);
+        }
+
+        .btn-support {
+            background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+        }
+
+        .btn-support:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.35);
+        }
+
+        .error {
+            color: #ef4444;
+            text-align: center;
+            margin-top: 12px;
+            font-size: 13px;
+            display: none;
+        }
+
+        .social {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-top: 24px;
+            padding-top: 18px;
+            border-top: 1px solid rgba(148, 163, 184, 0.2);
+        }
+
+        .social a {
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 13px;
+            transition: 0.2s;
+        }
+
+        .social a:hover {
+            color: #38bdf8;
+        }
+
+        .dashboard {
+            display: none;
+            width: 100%;
+            max-width: 420px;
+            background: rgba(30, 41, 59, 0.85);
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.35);
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .top-bar h2 {
+            font-size: 20px;
+            color: #38bdf8;
+        }
+
+        .user-info {
+            text-align: right;
+        }
+
+        .user-info span {
+            display: block;
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        .badge {
+            display: inline-block;
+            margin-top: 4px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            background: rgba(56, 189, 248, 0.15);
+            color: #38bdf8;
+        }
+
+        .btn-logout {
+            margin-top: 12px;
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .admin-panel {
+            display: none;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            border-radius: 16px;
+            padding: 18px;
+            margin-bottom: 18px;
+        }
+
+        .admin-panel h3 {
+            font-size: 15px;
+            color: #fbbf24;
+            margin-bottom: 12px;
+        }
+
+        .toggle-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .toggle-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            color: white;
+        }
+
+        .on {
+            background: #22c55e;
+        }
+
+        .off {
+            background: #ef4444;
+        }
+
+        .status {
+            font-size: 13px;
+            color: #94a3b8;
+            margin-bottom: 12px;
+        }
+
+        .status-on {
+            color: #22c55e;
+            font-weight: 700;
+        }
+
+        .status-off {
+            color: #ef4444;
+            font-weight: 700;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .tool-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            border-radius: 16px;
+            padding: 16px;
+        }
+
+        .tool-card h4 {
+            font-size: 14px;
+            color: #38bdf8;
+            margin-bottom: 8px;
+        }
+
+        .tool-card p {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-bottom: 10px;
+        }
+
+        .tool-input {
+            width: 100%;
+            padding: 11px 14px;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            border-radius: 10px;
+            color: white;
+            font-size: 14px;
+            outline: none;
+            margin-bottom: 10px;
+        }
+
+        .tool-btn {
+            width: 100%;
+            padding: 11px;
+            background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .result-box {
+            margin-top: 10px;
+            padding: 12px;
+            background: rgba(0,0,0,0.35);
+            border-radius: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            color: #22c55e;
+            white-space: pre-wrap;
+            max-height: 120px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .result-box.show {
+            display: block;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+            font-size: 13px;
+        }
+
+        th {
+            color: #38bdf8;
+        }
+
+        .btn-del {
+            padding: 5px 10px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 11px;
+            cursor: pointer;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HALAMAN LOGIN -->
+    <div id="loginPage" class="container">
+        <div class="logo">
+            <h1>SYAM OSINT</h1>
+            <p>Sistem Informasi Sumber Terbuka</p>
+        </div>
+
+        <div class="card">
+            <h3>⚓ Selamat Datang</h3>
+            <p>Masukkan username dan password untuk mengakses sistem SYAM OSINT.</p>
+        </div>
+
+        <div class="form-group">
+            <label>👤 Username</label>
+            <input type="text" id="username" placeholder="Masukkan username">
+        </div>
+
+        <div class="form-group">
+            <label>🔒 Password</label>
+            <input type="password" id="password" placeholder="Masukkan password">
+        </div>
+
+        <button class="btn btn-login" onclick="login()">➡️ MASUK</button>
+
+        <a href="https://wa.me/6283159105525" target="_blank" rel="noopener">
+            <button class="btn btn-wa">🛒 BELI AKSES</button>
+        </a>
+
+        <button class="btn btn-support" onclick="alert('Hai! Support siap membantu.\n\nWA: 083159105525\nTikTok: dak_boy09\nTelegram: @Dakboy12')">
+            🤖 HUBUNGI SUPPORT
+        </button>
+
+        <div class="error" id="errorMsg">❌ Username atau password salah!</div>
+
+        <div class="social">
+            <a href="https://t.me/Dakboy12" target="_blank" rel="noopener">Telegram</a>
+            <a href="https://tiktok.com/@dak_boy09" target="_blank" rel="noopener">TikTok</a>
+        </div>
+    </div>
+
+    <!-- HALAMAN DASHBOARD -->
+    <div id="dashboard" class="dashboard">
+        <div class="top-bar">
+            <h2>⚓ SYAM OSINT</h2>
+            <div class="user-info">
+                <span id="userDisplay">admin1</span>
+                <span class="badge" id="roleDisplay">ADMIN</span>
+                <button class="btn btn-logout" onclick="logout()">Keluar</button>
+            </div>
+        </div>
+
+        <!-- PANEL ADMIN -->
+        <div id="adminPanel" class="admin-panel">
+            <h3>⚙️ Panel Pengelolaan</h3>
+
+            <div id="websiteToggle" class="toggle-row">
+                <button class="toggle-btn on" onclick="setWebsiteStatus(true)">🟢 NYALAKAN</button>
+                <button class="toggle-btn off" onclick="setWebsiteStatus(false)">🔴 MATIKAN</button>
+            </div>
+
+            <div class="status">
+                Status Website: <span id="webStatusText" class="status-on">✅ ONLINE</span>
+            </div>
+
+            <div class="form-group">
+                <label>Username Baru</label>
+                <input type="text" id="newUser" placeholder="Username">
+            </div>
+
+            <div class="form-group">
+                <label>Password Baru</label>
+                <input type="password" id="newPass" placeholder="Password">
+            </div>
+
+            <div class="form-group">
+                <label>Role</label>
+                <select id="newRole" class="tool-input">
+                    <option value="Member">Member</option>
+                    <option value="Reseller">Reseller</option>
+                    <option value="Admin">Admin</option>
+                </select>
+            </div>
+
+            <button class="btn btn-login" onclick="createAccount()">➕ Buat Akun</button>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Pass</th>
+                        <th>Role</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="accountTable"></tbody>
+            </table>
+        </div>
+
+        <!-- ALAT OSINT -->
+        <div class="tools-grid">
+            <div class="tool-card">
+                <h4>📱 Cek Nomor HP</h4>
+                <p>Masukkan nomor untuk mencari informasi publik.</p>
+                <input type="text" class="tool-input" id="ph-num" placeholder="+62812xxxx">
+                <button class="tool-btn" onclick="cekNegara()">Cek Info</button>
+                <div class="result-box" id="ph-result"></div>
+            </div>
+
+            <div class="tool-card">
+                <h4>📧 Cek Email</h4>
+                <p>Validasi format email dan pencarian publik.</p>
+                <input type="text" class="tool-input" id="em-val" placeholder="nama@gmail.com">
+                <button class="tool-btn" onclick="cekEmail()">Cek Format</button>
+                <div class="result-box" id="em-result"></div>
+            </div>
+
+            <div class="tool-card">
+                <h4>🌐 Domain & IP</h4>
+                <p>Cek WHOIS, lokasi IP, dan DNS publik.</p>
+                <input type="text" class="tool-input" id="dom-ip" placeholder="google.com / 8.8.8.8">
+                <button class="tool-btn" onclick="cekDomainIP()">Cek Info</button>
+                <div class="result-box" id="dom-result"></div>
+            </div>
+
+            <div class="tool-card">
+                <h4>🔗 Cek Username</h4>
+                <p>Cari jejak username di media sosial publik.</p>
+                <input type="text" class="tool-input" id="user-name" placeholder="username">
+                <button class="tool-btn" onclick="cariSosmed()">Cari</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let accounts = {
+            'admin1': { pass: 'admin12', role: 'Admin' }
+        };
+
+        let currentUser = null;
+        let websiteActive = true;
+        let activeSessions = {};
+
+        const DEVICE_ID = localStorage.getItem('syam_device_id') || 'dev_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('syam_device_id', DEVICE_ID);
+
+        function loadData() {
+            const savedAccounts = localStorage.getItem('syam_accounts');
+            const savedStatus = localStorage.getItem('syam_web_status');
+            const savedSessions = localStorage.getItem('syam_sessions');
+
+            if (savedAccounts) accounts = JSON.parse(savedAccounts);
+            if (savedStatus !== null) websiteActive = savedStatus === 'true';
+            if (savedSessions) activeSessions = JSON.parse(savedSessions);
+
+            updateTampilanWebsite();
+        }
+
+        function simpanData() {
+            localStorage.setItem('syam_accounts', JSON.stringify(accounts));
+            localStorage.setItem('syam_web_status', websiteActive.toString());
+            localStorage.setItem('syam_sessions', JSON.stringify(activeSessions));
+        }
+
+        function updateTampilanWebsite() {
+            const statusText = document.getElementById('webStatusText');
+            if (!websiteActive) {
+                if (statusText) {
+                    statusText.textContent = '🔴 DITUTUP';
+                    statusText.className = 'status-off';
+                }
+            } else {
+                if (statusText) {
+                    statusText.textContent = '✅ ONLINE';
+                    statusText.className = 'status-on';
+                }
+            }
+        }
+
+        function setWebsiteStatus(nyala) {
+            if (currentUser?.role !== 'Admin') {
+                alert('❌ Hanya Admin yang boleh mengubah status website!');
+                return;
+            }
+
+            websiteActive = nyala;
+            simpanData();
+            updateTampilanWebsite();
+        }
+
+        function cekSesiAkun(username) {
+            if (activeSessions[username] && activeSessions[username] !== DEVICE_ID) {
+                return false;
+            }
+            return true;
+        }
+
+        function setSesiAkun(username, aktif) {
+            if (aktif) {
+                activeSessions[username] = DEVICE_ID;
+            } else {
+                delete activeSessions[username];
+            }
+            simpanData();
+        }
+
+        function login() {
+            const user = document.getElementById('username').value.trim();
+            const pass = document.getElementById('password').value;
+            const errorMsg = document.getElementById('errorMsg');
+
+            if (accounts[user] && accounts[user].pass === pass) {
+                if (!websiteActive && accounts[user].role !== 'Admin') {
+                    alert('🔴 Website sedang ditutup oleh Admin.');
+                    return;
+                }
+
+                if (!cekSesiAkun(user)) {
+                    alert('⚠️ Akun ini sedang dipakai di perangkat lain! 1 akun hanya untuk 1 HP.');
+                    return;
+                }
+
+                setSesiAkun(user, true);
+                currentUser = { username: user, ...accounts[user] };
+
+                document.getElementById('loginPage').classList.add('hidden');
+                document.getElementById('dashboard').style.display = 'block';
+                document.getElementById('userDisplay').textContent = user;
+                document.getElementById('roleDisplay').textContent = currentUser.role.toUpperCase();
+
+                const adminPanel = document.getElementById('adminPanel');
+                const websiteToggle = document.getElementById('websiteToggle');
+
+                if (currentUser.role === 'Admin') {
+                    adminPanel.style.display = 'block';
+                    websiteToggle.style.display = 'flex';
+                    renderTabelAkun();
+                } else if (currentUser.role === 'Reseller') {
+                    adminPanel.style.display = 'block';
+                    websiteToggle.style.display = 'none';
+                    renderTabelAkun();
+                } else {
+                    adminPanel.style.display = 'none';
+                }
+
+                errorMsg.style.display = 'none';
+            } else {
+                errorMsg.style.display = 'block';
+            }
+        }
+
+        function logout() {
+            if (currentUser) {
+                setSesiAkun(currentUser.username, false);
+            }
+
+            currentUser = null;
+            document.getElementById('loginPage').classList.remove('hidden');
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+        }
+
+        function renderTabelAkun() {
+            const tbody = document.getElementById('accountTable');
+            tbody.innerHTML = '';
+
+            for (const [user, data] of Object.entries(accounts)) {
+                const tr = document.createElement('tr');
+                const isAdmin = data.role === 'Admin';
+                const bisaHapus = currentUser?.role === 'Admin' && !isAdmin;
+
+                tr.innerHTML = `
+                    <td>${user}</td>
+                    <td>${data.pass}</td>
+                    <td>${data.role}</td>
+                    <td>
+                        ${bisaHapus ? `<button class="btn-del" onclick="hapusAkun('${user}')">Hapus</button>` : '—'}
+                    </td>
+                `;
+
+                tbody.appendChild(tr);
+            }
+        }
+
+        function createAccount() {
+            const newUser = document.getElementById('newUser').value.trim();
+            const newPass = document.getElementById('newPass').value;
+            const newRole = document.getElementById('newRole').value;
+
+            if (currentUser.role !== 'Admin' && currentUser.role !== 'Reseller') {
+                alert('❌ Kamu tidak punya izin membuat akun!');
+                return;
+            }
+
+            if (currentUser.role === 'Reseller' && newRole !== 'Member') {
+                alert('❌ Reseller hanya boleh membuat akun Member!');
+                return;
+            }
+
+            if (!newUser || !newPass) {
+                alert('Lengkapi username dan password!');
+                return;
+            }
+
+            if (accounts[newUser]) {
+                alert('Username sudah ada!');
+                return;
+            }
+
+            accounts[newUser] = { pass: newPass, role: newRole };
+            simpanData();
+            renderTabelAkun();
+
+            document.getElementById('newUser').value = '';
+            document.getElementById('newPass').value = '';
+
+            alert('✅ Akun berhasil dibuat!');
+        }
+
+        function hapusAkun(username) {
+            if (currentUser.role !== 'Admin') {
+                alert('❌ Hanya Admin yang boleh menghapus akun!');
+                return;
+            }
+
+            if (username === 'admin1') {
+                alert('❌ Tidak bisa menghapus akun utama!');
+                return;
+            }
+
+            if (confirm(`Yakin hapus akun ${username}?`)) {
+                delete accounts[username];
+                delete activeSessions[username];
+                simpanData();
+                renderTabelAkun();
+            }
+        }
+
+        function cekNegara() {
+            const num = document.getElementById('ph-num').value.trim();
+            const resBox = document.getElementById('ph-result');
+
+            if (!num) {
+                alert('Masukkan nomor dulu!');
+                return;
+            }
+
+            let country = 'Tidak terdeteksi', flag = '❓';
+
+            if (/^(\+?62|0)/.test(num)) { country = 'Indonesia'; flag = '🇮🇩'; }
+            else if (/^(\+?60)/.test(num)) { country = 'Malaysia'; flag = '🇲🇾'; }
+            else if (/^(\+?65)/.test(num)) { country = 'Singapura'; flag = '🇸🇬'; }
+            else if (/^(\+?1)/.test(num)) { country = 'Amerika Serikat / Kanada'; flag = '🇺🇸'; }
+            else if (/^(\+?44)/.test(num)) { country = 'Inggris'; flag = '🇬🇧'; }
+
+            resBox.classList.add('show');
+            resBox.textContent = `${flag} Negara: ${country}`;
+        }
+
+        function cekEmail() {
+            const email = document.getElementById('em-val').value.trim();
+            const resBox = document.getElementById('ph-result');
+
+            if (!email) {
+                alert('Masukkan email dulu!');
+                return;
+            }
+
+            const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+            resBox.classList.add('show');
+            resBox.textContent = valid ? `✅ Format email BENAR\n📧 ${email}` : `❌ Format email SALAH`;
+        }
+
+        function cekDomainIP() {
+            const val = document.getElementById('dom-ip').value.trim();
+            const resBox = document.getElementById('dom-result');
+
+            if (!val) {
+                alert('Masukkan domain atau IP dulu!');
+                return;
+            }
+
+            resBox.classList.add('show');
+            resBox.textContent = `🔍 Mencari informasi untuk: ${val}\n\nData ini hanya bersumber dari informasi publik.`;
+        }
+
+        function cariSosmed() {
+            const user = document.getElementById('user-name').value.trim();
+
+            if (!user) {
+                alert('Masukkan username dulu!');
+                return;
+            }
+
+            window.open(`https://www.google.com/search?q=${encodeURIComponent(user + ' Instagram Facebook Twitter TikTok')}`, '_blank');
+        }
+
+        document.getElementById('password').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') login();
+        });
+
+        window.addEventListener('beforeunload', function() {
+            if (currentUser) {
+                delete activeSessions[currentUser.username];
+                simpanData();
+            }
+        });
+
+        loadData();
+    </script>
+
+</body>
+</html>
